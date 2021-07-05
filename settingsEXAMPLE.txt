@@ -1,0 +1,13 @@
+command_prefix: >
+
+server_names: MySurvivalServer MyCreativeServer
+server_ips: yourserver.net yourcmp.net
+rcon_ports: 25540 25541
+rcon_passwords: secure_password another_secure_password
+
+ftp_usernames: survivalusername usernameforcreative
+ftp_passwords: yet_another_secure_password extremely_secure_password
+
+discord_bot_token: le.epic.token
+discord_channel_ids: 865981656454 98465189654654
+discord_channel_names: MyChannel MyOtherChannel
