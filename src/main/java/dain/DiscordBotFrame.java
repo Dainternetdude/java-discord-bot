@@ -4,24 +4,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Image;
 import java.io.*;
-import java.util.Scanner;
+import java.util.Objects;
 
 public class DiscordBotFrame extends JFrame {
 
     public static final int WIDTH_FRAME = 800;
     public static final int HEIGHT_FRAME = 650;
-    public static final int X_COORD_LOGO = 20;
-    public static final int Y_COORD_LOGO = 20;
-    public static final int WIDTH_LOGO = 100;
-    public static final int HEIGHT_LOGO = 100;
-    public static final int X_COORD_BUTTON = X_COORD_LOGO + WIDTH_LOGO + 10;
-    public static final int Y_COORD_BUTTON = Y_COORD_LOGO;
-    public static final int WIDTH_BUTTON = WIDTH_LOGO;
-    public static final int HEIGHT_BUTTON = HEIGHT_LOGO;
 
     private final GridBagLayout layout = new GridBagLayout();
     private final GridBagConstraints constraints = new GridBagConstraints();
@@ -111,7 +100,7 @@ public class DiscordBotFrame extends JFrame {
     public DiscordBotFrame() {
 
         JLabel logoLabel = new JLabel();
-        ImageIcon logoIcon = new ImageIcon("logo.png"); // chat bridge graphic
+        ImageIcon logoIcon = new ImageIcon(Objects.requireNonNull(getClass().getClassLoader().getResource("logo.png"))); // chat bridge graphic
         logoLabel.setIcon(logoIcon);
         addComponent(logoLabel, layout, 0, 0, 1, 2, GridBagConstraints.BOTH);
 
@@ -122,32 +111,12 @@ public class DiscordBotFrame extends JFrame {
         JButton settingsButton = new JButton(); // no text on settings button just gear icon
         settingsButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                /*if(event.getSource() == settingsButton) {
-                    setTitle("Saving...");
-                    sleap((int)(Math.random() * 1000.0));
-                    String nameText = nameTextField.getText();
-                    String addressText = logTextArea.getText();
-                    setTitle("Saving 34%");
-                    sleap((int)(Math.random() * 1000.0));
-                    try {
-                        FileWriter out = new FileWriter("order.txt");
-                        setTitle("Saving 78%");
-                        sleap((int)(Math.random() * 5000.0));
-                        out.write(nameText + "\n" + addressText);
-                        out.close();
-                        setTitle("Saved");
-                    } catch (FileNotFoundException e) {
-                        System.out.println("problem: file not found exception");
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        System.out.println("problem: input/output exception");
-                        e.printStackTrace();
-                        setTitle("Unable to save");
-                    }
-                }*/
+                if(event.getSource() == settingsButton) {
+                    new SettingsFrame();
+                }
             }
         });
-        ImageIcon settingsIcon = new ImageIcon("settings-icon.png");
+        ImageIcon settingsIcon = new ImageIcon(Objects.requireNonNull(getClass().getClassLoader().getResource("settings-icon.png")));
         settingsButton.setIcon(settingsIcon);
         settingsButton.setToolTipText("Open settings pane");
         settingsButton.setSize(20, 30);

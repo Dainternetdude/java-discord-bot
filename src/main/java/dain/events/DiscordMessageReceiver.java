@@ -110,7 +110,7 @@ public class DiscordMessageReceiver extends ListenerAdapter {
 
         for (int id = 0; id < Settings.SERVER_IPS.length; id++) {
             try {
-                Rcon rcon = new Rcon(Settings.SERVER_IPS[id], Settings.RCON_PORTS[id], Settings.RCON_PASSWORDS[id].getBytes());
+                Rcon rcon = new Rcon(Settings.SERVER_IPS[id], Integer.decode(Settings.RCON_PORTS[id]), Settings.RCON_PASSWORDS[id].getBytes());
                 rcon.command(command);
                 rcon.disconnect();
             } catch (IOException e) {

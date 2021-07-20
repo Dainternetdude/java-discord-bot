@@ -5,14 +5,13 @@ import java.io.FileNotFoundException;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Scanner;
 
-public class Settings { //todo read settings from external text file and
-                        //todo upload to github
+public class Settings {
 
     public static String COMMAND_PREFIX;
 
     public static String [] SERVER_NAMES;
     public static String [] SERVER_IPS;
-    public static int [] RCON_PORTS;
+    public static String [] RCON_PORTS;
     public static String [] RCON_PASSWORDS;
 
     public static String [] FTP_USERNAMES;
@@ -67,13 +66,8 @@ public class Settings { //todo read settings from external text file and
                 break;
             case "rcon_ports":
 
-                RCON_PORTS = new int[lineArray.length - 1];
-                String[] rconPorts = new String[lineArray.length - 1];
-                System.arraycopy(lineArray, 1, rconPorts, 0, lineArray.length - 1);
-
-                for (int i = 0; i < rconPorts.length; i++) {
-                    RCON_PORTS[i] = Integer.decode(rconPorts[i]);
-                }
+                RCON_PORTS = new String[lineArray.length - 1];
+                System.arraycopy(lineArray, 1, RCON_PORTS, 0, lineArray.length - 1);
 
                 break;
             case "rcon_passwords":

@@ -3,3 +3,12 @@
 /build/
 /out/
 /out/production/classes/
+/0latest.log
+/1latest.log
+/settings.txt
+/.idea/
+/gradle/
+/build.gradle
+/gradlew
+/gradlew.bat
+/settings.gradle
