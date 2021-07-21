@@ -1,7 +1,6 @@
 package dain;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Scanner;
 
@@ -21,12 +20,17 @@ public class Settings {
     public static String [] DISCORD_CHANNEL_IDS; //{ "412344354980495370", "805864136121516063" };//803345769972760599
     public static String [] DISCORD_CHANNEL_NAMES;
 
+    public static final String filename = "settings.txt";
+
     public static void initialize() {
 
         String line;
 
         try {
-            File file = new File("settings.txt");
+            File file = new File(filename);
+            if (file.createNewFile()) {
+                writeExampleFile();
+            }
             Scanner myReader = new Scanner(file);
 
             while (myReader.hasNextLine()) {
@@ -35,8 +39,8 @@ public class Settings {
                 processLine(line);
             }
             myReader.close();
-        } catch (FileNotFoundException e) {
-            System.out.println("File not found. Where is settings.txt?");
+
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -106,5 +110,60 @@ public class Settings {
 
                 break;
         }
+    }
+
+    public static void writeToFile() {
+        try {
+            BufferedWriter out = new BufferedWriter(new FileWriter(filename));
+            out.write("command_prefix: " + COMMAND_PREFIX + "\n" +
+                    "\n" +
+                    "server_names: " + combine(SERVER_NAMES) + "\n" +
+                    "server_ips: " + combine(SERVER_IPS) + "\n" +
+                    "rcon_ports: " + combine(RCON_PORTS) + "\n" +
+                    "rcon_passwords: " + combine(RCON_PASSWORDS) + "\n" +
+                    "\n" +
+                    "ftp_usernames: " + combine(FTP_USERNAMES) + "\n" +
+                    "ftp_passwords: " + combine(FTP_PASSWORDS) + "\n" +
+                    "\n" +
+                    "discord_bot_token: " + DISCORD_TOKEN + "\n" +
+                    "discord_channel_ids: " + combine(DISCORD_CHANNEL_IDS) + "\n" +
+                    "discord_channel_names: " + combine(DISCORD_CHANNEL_NAMES) + "\n");
+            out.close();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void writeExampleFile() {
+        try {
+            BufferedWriter out = new BufferedWriter(new FileWriter(filename));
+            out.write("command_prefix: >\n" +
+                    "\n" +
+                    "server_names: MySurvivalServer MyCreativeServer\n" +
+                    "server_ips: yourserver.net yourcmp.net\n" +
+                    "rcon_ports: 25540 25541\n" +
+                    "rcon_passwords: secure_password another_secure_password\n" +
+                    "\n" +
+                    "ftp_usernames: survivalusername usernameforcreative\n" +
+                    "ftp_passwords: yet_another_secure_password extremely_secure_password\n" +
+                    "\n" +
+                    "discord_bot_token: le.epic.token89413186135478651684518451684513851685136851385195\n" +
+                    "discord_channel_ids: 865981656454 98465189654654\n" +
+                    "discord_channel_names: MyChannel MyOtherChannel\n");
+            out.close();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static String combine(String[] stringArray) {
+        String stringOut = "";
+        for (int i = 0; i < stringArray.length; i++) {
+            stringOut = stringOut + stringArray[i];
+            if (i != stringArray.length - 1) stringOut = stringOut + " ";
+        }
+        return stringOut;
     }
 }

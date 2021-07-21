@@ -11,6 +11,18 @@ import java.io.IOException;
 
 public class DiscordMessageReceiver extends ListenerAdapter {
 
+    private enum Commands { // todo maybe better as an enum?
+            KILL("kill"),
+            SCORE("score"),
+            HELP("help");
+
+            private String value;
+
+        private Commands(String valueIn) {
+            this.value = valueIn;
+        }
+    };
+
     public void onMessageReceived(MessageReceivedEvent event) {
 
         if (event.getMessage().getAuthor().equals(event.getJDA().getSelfUser())) return;
@@ -19,23 +31,21 @@ public class DiscordMessageReceiver extends ListenerAdapter {
         String[] messageSentCharArray = messageSent.split("");
         String[] messageSentWordArray = messageSent.split(" ");
 
-        if(messageSentCharArray[0].equals(">")) { //todo fix quotes activating commands
-
-            event.getChannel().sendMessage("a command has been entered.").queue();
+        if(messageSentCharArray[0].equals(Settings.COMMAND_PREFIX)) { //todo fix quotes activating commands
 
             String commandName = messageSentWordArray[0].substring(1).toLowerCase();
 
-            event.getChannel().sendMessage("the command was named as this: " + commandName).queue();
-
             switch (commandName) {
-                case "kill": //todo remove
+                case "kill": // kill //todo remove
                     runKill(event);
                     break;
-                case "score":
+                case "score": // score
                     runScore(event);
                     break;
-                case "help":
+                case "help": // help
                     runHelp(event);
+                    break;
+                default:
                     break;
             }
         }
@@ -96,9 +106,9 @@ public class DiscordMessageReceiver extends ListenerAdapter {
     }
 
     private void runHelp(MessageReceivedEvent event) {
-        event.getChannel().sendMessage("There are approximately numberOfCommandsWhichThereIs commands.\n" +
-                "`" + Settings.COMMAND_PREFIX + "help` = displays this message\n" +
-                "`" + Settings.COMMAND_PREFIX + "kill` = kills the who sent the message").queue();
+        event.getChannel().sendMessage("There are approximately " + Commands.values().length + " commands.\n" +
+                "`" + Settings.COMMAND_PREFIX + "help" + "` = displays this message\n" +
+                "`" + Settings.COMMAND_PREFIX + "kill" + "` = kills the who sent the message").queue();
     }
 
     private void sendMessageToMc(Message message) {

@@ -5,6 +5,8 @@ import com.apple.laf.AquaButtonBorder;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.lang.reflect.Field;
 
 public class SettingsFrame extends JFrame {
@@ -15,6 +17,7 @@ public class SettingsFrame extends JFrame {
 
     private final GridBagConstraints constraints = new GridBagConstraints();
     private static final Color lightLightGray = new Color(223, 223, 223);
+    private JTextField[] textFields;
 
     public SettingsFrame() {
 
@@ -67,7 +70,7 @@ public class SettingsFrame extends JFrame {
         constraints.anchor = GridBagConstraints.WEST;
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.gridwidth = 200;
-        JTextField[] textFields = new JTextField[textFieldNames.length];
+        textFields = new JTextField[textFieldNames.length];
         GridBagLayout rightgbl = new GridBagLayout();
         JPanel rightPanel = new JPanel();
         for (int i = 0; i < textFieldNames.length; i++) {
@@ -85,6 +88,12 @@ public class SettingsFrame extends JFrame {
          */
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton saveButton = new JButton("Save");
+        saveButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (e.getSource().equals(saveButton)) saveValues();
+            }
+        });
         bottomPanel.add(saveButton);
 
         /*
@@ -148,5 +157,24 @@ public class SettingsFrame extends JFrame {
             e.printStackTrace();
         }
         this.setOpacity(opacity);
+    }
+
+    public void saveValues() {
+
+        Settings.COMMAND_PREFIX = textFields[0].getText();
+
+        Settings.SERVER_NAMES = textFields[1].getText().split(" ");
+        Settings.SERVER_IPS = textFields[2].getText().split(" ");
+        Settings.RCON_PORTS = textFields[3].getText().split(" ");
+        Settings.RCON_PASSWORDS = textFields[4].getText().split(" ");
+
+        Settings.FTP_USERNAMES = textFields[5].getText().split(" ");
+        Settings.FTP_PASSWORDS = textFields[6].getText().split(" ");
+
+        Settings.DISCORD_TOKEN = textFields[7].getText();
+        Settings.DISCORD_CHANNEL_IDS = textFields[8].getText().split(" ");
+        Settings.DISCORD_CHANNEL_NAMES = textFields[9].getText().split(" ");
+
+        Settings.writeToFile();
     }
 }
