@@ -1,31 +1,27 @@
 package dain;
 
-import dain.MinecraftChatBridge;
-import dain.Settings;
 import dain.events.DiscordMessageReceiver;
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.*;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.TextChannel;
-
 import javax.security.auth.login.LoginException;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class Bot {
 
     private JDA jda;
+    private TokenEntryFrame tokenEntryFrame = null;
 
     public Bot() {
 
         Settings.initialize();
 
-        try {
-            jda = JDABuilder.createDefault(Settings.DISCORD_TOKEN).setActivity(Activity.listening(">help")).build();
-        } catch (LoginException e) {
-            e.printStackTrace();
+        while (jda == null) {
+            jda = loginJDAClient();
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
 
         jda.addEventListener(new DiscordMessageReceiver());
@@ -72,5 +68,16 @@ public class Bot {
 
     public JDA getJda() {
         return jda;
+    }
+
+    private JDA loginJDAClient() {
+        try {
+            return JDABuilder.createDefault(Settings.DISCORD_TOKEN).setActivity(Activity.listening(Settings.COMMAND_PREFIX + "help")).build();
+        } catch (LoginException e) {
+            if (tokenEntryFrame == null) {
+                tokenEntryFrame = new TokenEntryFrame();
+            }
+            return null;
+        }
     }
 }

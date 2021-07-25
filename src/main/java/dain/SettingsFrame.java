@@ -1,7 +1,5 @@
 package dain;
 
-import com.apple.laf.AquaButtonBorder;
-
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
@@ -91,7 +89,10 @@ public class SettingsFrame extends JFrame {
         saveButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (e.getSource().equals(saveButton)) saveValues();
+                if (e.getSource().equals(saveButton)) {
+                    saveValues();
+                    SettingsFrame.this.dispose();
+                }
             }
         });
         bottomPanel.add(saveButton);
