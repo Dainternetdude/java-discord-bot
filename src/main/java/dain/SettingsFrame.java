@@ -167,14 +167,14 @@ public class SettingsFrame extends JFrame {
         Settings.SERVER_NAMES = textFields[1].getText().split(" ");
         Settings.SERVER_IPS = textFields[2].getText().split(" ");
         Settings.RCON_PORTS = textFields[3].getText().split(" ");
-        Settings.RCON_PASSWORDS = textFields[4].getText().split(" ");
+        Settings.RCON_PASSWORDS = textFields[4].getText().split(" "); //todo add error catching if lists are wrongly lengths
 
         Settings.FTP_USERNAMES = textFields[5].getText().split(" ");
         Settings.FTP_PASSWORDS = textFields[6].getText().split(" ");
 
         Settings.DISCORD_TOKEN = textFields[7].getText();
         Settings.DISCORD_CHANNEL_IDS = textFields[8].getText().split(" ");
-        Settings.DISCORD_CHANNEL_NAMES = textFields[9].getText().split(" ");
+        Settings.DISCORD_CHANNEL_NAMES = textFields[9].getText().split(" "); //todo ditto
 
         Settings.writeToFile();
     }

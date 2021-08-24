@@ -47,18 +47,18 @@ public class Bot {
         myThread.setDaemon(true);
         myThread.start();*/
 
-        Thread myThread2 = new Thread(new MinecraftChatBridge(this, 1));
+        /*Thread myThread2 = new Thread(new MinecraftChatBridge(this, 1));
         myThread2.setDaemon(true);
-        myThread2.start();
+        myThread2.start();*/
 
-        /*Thread [] threads = new Thread[Settings.SERVER_NAMES.length];
-        for (int i = 0; i < Settings.SERVER_NAMES.length; i++) {
+        Thread [] threads = new Thread[Settings.SERVER_NAMES.length - 1];
+        for (int i = 1; i < Settings.SERVER_NAMES.length; i++) {
             //channels[0].sendMessage("Initializing thread " + i).queue();
-            threads[i] = new Thread(new MinecraftChatBridge(this, i));
-            threads[i].setDaemon(true);
-            threads[i].start();
+            threads[i-1] = new Thread(new MinecraftChatBridge(this, i));
+            threads[i-1].setDaemon(true);
+            threads[i-1].start();
             //channels[0].sendMessage("Initialized thread " + i).queue();
-        }*/
+        }
 
         MinecraftChatBridge chatBridge = new MinecraftChatBridge(this, 0);
         chatBridge.run();
