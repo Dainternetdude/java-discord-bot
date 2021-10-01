@@ -1,12 +1,16 @@
 package dain;
 
+import dain.events.DiscordMessageReceiver;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.kronos.rkon.core.Rcon;
+import net.kronos.rkon.core.ex.AuthenticationException;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 
 import java.io.*;
-import java.net.ConnectException;
+import java.util.Locale;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -40,51 +44,10 @@ public class MinecraftChatBridge implements Runnable {
         }
     }
 
-    public void refreshLogFile() {
-
-        int port = 21;
-        FTPClient ftpClient = new FTPClient();
-        try {
-
-            ftpClient.connect(Settings.SERVER_IPS[id], port);
-            ftpClient.login(Settings.FTP_USERNAMES[id], Settings.FTP_PASSWORDS[id]);
-            ftpClient.enterLocalPassiveMode();
-            ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
-
-            //sendMessageAllChannels("Getting file on thread " + id);
-
-            String logFile = "/logs/latest.log";
-            File downloadFile1 = new File(id + "latest.log");
-            OutputStream outputStream1 = new BufferedOutputStream(new FileOutputStream(downloadFile1));
-            boolean success = ftpClient.retrieveFile(logFile, outputStream1);
-            outputStream1.close();
-
-            /*
-            if (success) {
-                sendMessageAllChannels("`latest.log` has been downloaded successfully on thread " + id);
-            } else {
-                sendMessageAllChannels("issue downloading file on thread " + id);
-            }
-             */
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (ftpClient.isConnected()) {
-                    ftpClient.logout();
-                    ftpClient.disconnect();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
     public void sendNewMessages() {
         //sendMessageAllChannels("thread " + id + " sending new messages");
 
-        refreshLogFile();
+        FTPHandler.grabFile("/logs/latest.log", id);
         try {
             File file = new File(id + "latest.log");
             Scanner myReader = new Scanner(file);
@@ -108,13 +71,26 @@ public class MinecraftChatBridge implements Runnable {
             return;
         }
 
-        lastLines[id] = lastLines[id].replaceAll("(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)", "[IP ADDRESS REDACTED]");
+        String processedLine = processLine(lastLines[id]);
+
+        sendMessageAllChannels(processedLine);
+    }
+
+    private void sendMessageAllChannels(String message) {
+        for (int i = 0; i < Settings.DISCORD_CHANNEL_IDS.length; i++) {
+            channels[i].sendMessage(message).queue();
+        }
+    }
+
+    private String processLine(String line) {
+
+        line = line.replaceAll("(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)", "[IP ADDRESS REDACTED]");
         // ^above replaces ipv4 IP addresses with "[IP ADDRESS REDACTED]"
 
         //break the message up into an array of strings for each word
-        String[] lastLineArray = lastLines[id].split(" ");
+        String[] lineArray = line.split(" ");
 
-        //change @ into mentions
+        //todo change @ into mentions
         /*
         for (int i = 0; i < lastLineArray.length; i++) {
             if (lastLineArray[i].startsWith("@")) {
@@ -124,35 +100,120 @@ public class MinecraftChatBridge implements Runnable {
             }
         }*/
 
+        //todo change :emoji: to emojis
+
         // make the <name> part of chat messages bold
         boolean isChatMessage;
-        if (lastLineArray[0].startsWith("<") && lastLineArray[0].endsWith(">")) {
-            lastLineArray[0] = "**" + lastLineArray[0] + "**";
+        String author = "";
+        if (lineArray[0].startsWith("<") && lineArray[0].endsWith(">")) {
+            lineArray[0] = "**" + lineArray[0] + "**";
             isChatMessage = true;
+            author = lineArray[0].substring(1, lineArray[0].length() - 2);
+
+            if (lineArray[1].startsWith(">")) {
+
+                String[] parameterArray = new String[lineArray.length - 2];
+                for (int i = 2; i < lineArray.length; i++) {
+                    parameterArray[i - 2] = lineArray[i];
+                }
+
+                CommandHandler.handleMcCommand(lineArray[1].substring(1).toLowerCase(), parameterArray, id);
+            }
         } else isChatMessage = false;
 
         //join the array of strings back up to a complete message
-        lastLines[id] = lastLineArray[0];
-        for (int i = 1; i < lastLineArray.length; i++) {
-            lastLines[id] = lastLines[id] + " " + lastLineArray[i];
+        line = lineArray[0];
+        String message = "";
+        for (int i = 1; i < lineArray.length; i++) {
+            line = line + " " + lineArray[i];
+            message = message + lineArray[i] + " ";
         }
 
         //make non-chat messages bold
         if (!isChatMessage) {
-            lastLines[id] = "**" + lastLines[id] + "**";
+            message = line;
+            line = "**" + line + "**";
         }
 
         //say if its coming from smp or cmp
-        lastLines[id] = "[" + Settings.SERVER_NAMES[id] + "] " + lastLines[id];
+        line = "[" + Settings.SERVER_NAMES[id] + "] " + line;
 
-        //scoreboard junk
+        if (isChatMessage) {
+            sendMessageAllOtherServers(author, message);
+        } else {
+            sendMessageAllOtherServers(message);
+        }
 
-        sendMessageAllChannels(lastLines[id]);
+        return line;
     }
 
-    private void sendMessageAllChannels(String message) {
-        for (int i = 0; i < Settings.DISCORD_CHANNEL_IDS.length; i++) {
-            channels[i].sendMessage(message).queue();
+    private void sendMessageAllOtherServers(String author, String message) {
+        for (int i = 0; i < Settings.SERVER_IPS.length; i++) {
+            if (i != id) {
+                sendMessageToServer(author, message, i);
+            }
         }
     }
+
+    private void sendMessageAllOtherServers(String message) {
+        for (int i = 0; i < Settings.SERVER_IPS.length; i++) {
+            if (i != id) {
+                sendMessageToServer(message, i);
+            }
+        }
+    }
+
+    public static void sendMessageAllServers(String message) {
+        for (int i = 0; i < Settings.SERVER_IPS.length; i++) {
+            sendMessageToServer(message, i);
+        }
+    }
+
+    public static void sendMessageToMc(Message message) {
+        //TODO replace emojis with :emoji_name:
+
+        //TODO replace attachments with text
+
+        String command = generateCommand(message.getAuthor().getName(), message.getContentRaw());
+
+        for (int id = 0; id < Settings.SERVER_IPS.length; id++) {
+            sendCommandToServer(command, id);
+        }
+    }
+
+    public static void sendMessageToServer(String author, String message, int serverId) {
+
+        String command = generateCommand(author, message);
+
+        sendCommandToServer(command, serverId);
+    }
+
+    public static void sendMessageToServer(String message, int serverId) {
+
+        String command = generateCommand(message);
+
+        sendCommandToServer(command, serverId);
+    }
+
+    private static String generateCommand(String author, String message) {
+        return "tellraw @a [\"\",{\"text\":\"<\"},{\"text\":\"@\",\"color\":\"gray\"}, {\"text\":\"" + author + "\",\"color\":\"white\"},{\"text\":\"> " + message + "\"}]";
+    }
+
+    private static String generateCommand(String message) {
+        return "tellraw @a \"" + message + "\"";
+    }
+
+    public static void sendCommandToServer(String command, int serverId) {
+        try {
+            Rcon rcon = new Rcon(Settings.SERVER_IPS[serverId], Integer.decode(Settings.RCON_PORTS[serverId]), Settings.RCON_PASSWORDS[serverId].getBytes());
+            rcon.command(command);
+            rcon.disconnect();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (AuthenticationException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 }
