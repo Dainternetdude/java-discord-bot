@@ -6,16 +6,19 @@ Here's what makes this implementation unique:
 - Compatible with vanilla (no mods or plugins of any kind required)
 - Compatible with any Minecraft version
 - Can be run remotely
-- Beautiful graphical user interface (WIP)
+- Beautiful graphical interface (WIP)
 - Easy setup & configuration
 - Supports multiple Minecraft servers
 - Supports multiple Discord channels
+
+# Features
+- In-game scoreboard changing for non-operators using "[command prefix]score [scoreboard name]" (or "s" instead of "score")
 
 # Planned features
 - Emoji conversion
 - Mention conversion
 - Attachment support for Discord->Minecraft (currently attachments send as whitespace)
-- Scoreboard commands
+- Discord scoreboard commands
 
 # Contributing
 If you find an issue, report it in the issues tab.  
