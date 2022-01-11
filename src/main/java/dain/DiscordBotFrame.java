@@ -1,5 +1,7 @@
 package dain;
 
+import dain.events.Logger;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
@@ -138,7 +140,12 @@ public class DiscordBotFrame extends JFrame {
 
         JTextArea logTextArea = new JTextArea(24, 64); // log text area
         logTextArea.setEnabled(false);
-        addComponent(logTextArea, layout, 0, 3, 2, 1, GridBagConstraints.NONE);
+        JScrollPane logScrollPane = new JScrollPane(logTextArea);
+        logScrollPane.setWheelScrollingEnabled(false); // do not allow scrolling with mouse scroll wheel
+        logScrollPane.setHorizontalScrollBarPolicy(31); // 31 = never show horizontal scroll bar
+        logScrollPane.setVerticalScrollBarPolicy(21); // 21 = never show vertical scroll bar
+        addComponent(logScrollPane, layout, 0, 3, 2, 1, GridBagConstraints.NONE);
+        Logger.setTextArea(logTextArea);
 
         //constraints.insets = new Insets(1, 1, 1, 1);
 
@@ -159,7 +166,7 @@ public class DiscordBotFrame extends JFrame {
         try {
             Thread.sleep(ms);
         } catch(InterruptedException exception) {
-            System.out.println("problem: thread interrupted exception");
+            Logger.log("thread interrupted exception", Logger.LoggingLevel.ERROR);
         }
     }
 

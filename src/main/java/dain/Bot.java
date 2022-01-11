@@ -1,6 +1,7 @@
 package dain;
 
 import dain.events.DiscordMessageReceiver;
+import dain.events.Logger;
 import net.dv8tion.jda.api.*;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -40,6 +41,7 @@ public class Bot {
         TextChannel [] channels = new TextChannel[Settings.DISCORD_CHANNEL_IDS.length];
         for(int i = 0; i < Settings.DISCORD_CHANNEL_IDS.length; i++) {
             channels[i] = jda.getTextChannelById(Settings.DISCORD_CHANNEL_IDS[i]);
+            Logger.log("Chat Bridge active.", Logger.LoggingLevel.INFO);
             channels[i].sendMessage("Chat bridge active.").queue();
         }
 

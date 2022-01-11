@@ -46,9 +46,10 @@ public class DiscordMessageReceiver extends ListenerAdapter {
             CommandHandler.handleDiscordCommand(commandName, parameters, event); //todo remove event
         }
 
-        for (int id = 0; id < Settings.DISCORD_CHANNEL_IDS.length; id++) {
-            if (event.getChannel() == event.getJDA().getTextChannelById(Settings.DISCORD_CHANNEL_IDS[id])) {
-                MinecraftChatBridge.sendMessageToMc(event.getMessage());
+        for (int id = 0; id < Settings.DISCORD_CHANNEL_IDS.length; id++) { // for all Discord channels ids in config
+            if (event.getChannel() == event.getJDA().getTextChannelById(Settings.DISCORD_CHANNEL_IDS[id])) { // if the channel id from the config matches one of the channel id that the message was sent from //todo need to optimize this
+                Logger.log("Message received from Discord: " + messageSent, Logger.LoggingLevel.INFO);
+                MinecraftChatBridge.sendMessageToMc(event.getMessage()); // send message to mc
             }
         }
         return;

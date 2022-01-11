@@ -24,4 +24,9 @@ Here's what makes this implementation unique:
 If you find an issue, report it in the issues tab.  
 If you have a feature you'd like to see, post it in the issues tab.  
 If you've written code you want to see in the program, feel free to make a pull request.  
-If you think my code is bad, I already know about it. Make an issue if you like and I'll look into it if I'm not lazy.  
+If you think my code is bad, I already know about it. Make an issue if you like and I'll look into it if I'm not lazy.
+
+# Instructions to build
+1. Clone this repository
+2. Run `gradlew shadowJar`
+3. Look in `build/libs/`

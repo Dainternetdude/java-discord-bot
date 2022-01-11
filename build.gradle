@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'org.example'
-version '1.4'
+version '1.5'
 
 repositories {
     mavenCentral()
@@ -17,7 +17,7 @@ repositories {
 dependencies {
     //testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
     //testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
-    compile("net.dv8tion:JDA:4.3.0_298")
+    compile "net.dv8tion:JDA:4.3.0_298"
     compile group: 'commons-net', name: 'commons-net', version: '3.3'
     compile fileTree(include: ['*.jar'], dir: 'libs')
 }

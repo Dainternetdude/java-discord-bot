@@ -122,7 +122,7 @@ public class SettingsFrame extends JFrame {
         this.setMinimumSize(this.getSize());
 
         //makes the frame 5% transparent (95% opaque)
-        this.setOpacityWithDecoration(0.95F); //must be AFTER setVisible(true)!!!
+        //this.setOpacityWithDecoration(0.95F); //must be AFTER setVisible(true)!!!
     }
 
     // remember that the position starts at 0 but the size does not

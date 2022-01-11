@@ -1,18 +1,14 @@
 package dain;
 
-import dain.events.DiscordMessageReceiver;
+import dain.events.Logger;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.kronos.rkon.core.Rcon;
 import net.kronos.rkon.core.ex.AuthenticationException;
-import org.apache.commons.net.ftp.FTP;
-import org.apache.commons.net.ftp.FTPClient;
 
 import java.io.*;
-import java.util.Locale;
-import java.util.Random;
-import java.util.Scanner;
+import java.util.*;
 
 public class MinecraftChatBridge implements Runnable {
 
@@ -51,12 +47,12 @@ public class MinecraftChatBridge implements Runnable {
         try {
             File file = new File(id + "latest.log");
             Scanner myReader = new Scanner(file);
-            while (myReader.hasNextLine()) {
+            while (myReader.hasNextLine()) { // change to detect new lines instead of most recent line
                 lastLines[id] = myReader.nextLine();
             }
             myReader.close();
         } catch (FileNotFoundException e) {
-            System.out.println("File not found. Where is latest.log?");
+            Logger.log("File not found. Where is latest.log?", Logger.LoggingLevel.ERROR);
             e.printStackTrace();
         }
         if (lastLines[id].equals(previousLines[id])) return;
@@ -70,10 +66,13 @@ public class MinecraftChatBridge implements Runnable {
         } catch (IndexOutOfBoundsException e) {
             return;
         }
+        Logger.log("Message received from Minecraft: " + lastLines[id], Logger.LoggingLevel.INFO);
 
         String processedLine = processLine(lastLines[id]);
 
         sendMessageAllChannels(processedLine);
+
+        Logger.log("Message sent to Discord: " + processedLine, Logger.LoggingLevel.INFO);
     }
 
     private void sendMessageAllChannels(String message) {
@@ -84,8 +83,8 @@ public class MinecraftChatBridge implements Runnable {
 
     private String processLine(String line) {
 
+        // replace ipv4 IP addresses with "[IP ADDRESS REDACTED]"
         line = line.replaceAll("(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)", "[IP ADDRESS REDACTED]");
-        // ^above replaces ipv4 IP addresses with "[IP ADDRESS REDACTED]"
 
         //break the message up into an array of strings for each word
         String[] lineArray = line.split(" ");
@@ -179,6 +178,7 @@ public class MinecraftChatBridge implements Runnable {
         for (int id = 0; id < Settings.SERVER_IPS.length; id++) {
             sendCommandToServer(command, id);
         }
+        Logger.log("Message sent to Minecraft: " + message, Logger.LoggingLevel.INFO);
     }
 
     public static void sendMessageToServer(String author, String message, int serverId) {

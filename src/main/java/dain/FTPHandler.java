@@ -1,7 +1,9 @@
 package dain;
 
+import dain.events.Logger;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPConnectionClosedException;
 
 import java.io.*;
 
@@ -35,17 +37,11 @@ public class FTPHandler {
             }
              */
 
+            ftpClient.logout();
+            ftpClient.disconnect();
+
         } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (ftpClient.isConnected()) {
-                    ftpClient.logout();
-                    ftpClient.disconnect();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            Logger.log("I/O Exception during FTP handling", Logger.LoggingLevel.ERROR);
         }
     }
 }
