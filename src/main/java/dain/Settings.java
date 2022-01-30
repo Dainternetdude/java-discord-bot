@@ -6,6 +6,7 @@ import java.util.Scanner;
 
 public class Settings {
 
+    // bot settings
     public static String COMMAND_PREFIX;
 
     public static String [] SERVER_NAMES;
@@ -17,10 +18,14 @@ public class Settings {
     public static String [] FTP_PASSWORDS;
 
     public static String DISCORD_TOKEN;
-    public static String [] DISCORD_CHANNEL_IDS; //{ "412344354980495370", "805864136121516063" };//803345769972760599
+    public static String [] DISCORD_CHANNEL_IDS;
     public static String [] DISCORD_CHANNEL_NAMES;
 
     public static final String filename = "settings.txt";
+
+    // program settings
+    public static boolean useGui = true;
+    public static boolean isLocal = false;
 
     public static void initialize() {
 
@@ -42,6 +47,13 @@ public class Settings {
 
         } catch (IOException e) {
             e.printStackTrace();
+        }
+
+        if (isLocal) {
+            Logger.log("Bot is running in local mode. Server IPs & FTP login details will be overridden.", Logger.LoggingLevel.WARN);
+            SERVER_IPS = new String[] {"127.0.0.1"};
+            FTP_USERNAMES = new String[0];
+            FTP_PASSWORDS = new String[0];
         }
     }
 

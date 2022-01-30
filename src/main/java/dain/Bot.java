@@ -1,11 +1,15 @@
 package dain;
 
 import dain.events.DiscordMessageReceiver;
-import dain.events.Logger;
 import net.dv8tion.jda.api.*;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.TextChannel;
 import javax.security.auth.login.LoginException;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Locale;
+import java.util.Scanner;
 
 public class Bot {
 
@@ -33,7 +37,7 @@ public class Bot {
             e.printStackTrace();
         }
 
-        DiscordBotFrame discordBotFrame = new DiscordBotFrame(); // creates gui
+        if (Settings.useGui) new DiscordBotFrame(); // creates gui
     }
 
     public void startChatBridge() {
@@ -53,19 +57,30 @@ public class Bot {
         myThread2.setDaemon(true);
         myThread2.start();*/
 
-        Thread [] threads = new Thread[Settings.SERVER_NAMES.length - 1];
-        for (int i = 1; i < Settings.SERVER_NAMES.length; i++) {
+        Thread [] threads = new Thread[Settings.SERVER_NAMES.length];
+        for (int i = 0; i < Settings.SERVER_NAMES.length; i++) {
             //channels[0].sendMessage("Initializing thread " + i).queue();
-            threads[i-1] = new Thread(new MinecraftChatBridge(this, i));
-            threads[i-1].setDaemon(true);
-            threads[i-1].start();
+            threads[i] = new Thread(new MinecraftChatBridge(this, i));
+            threads[i].setDaemon(true);
+            threads[i].start();
             //channels[0].sendMessage("Initialized thread " + i).queue();
         }
 
-        MinecraftChatBridge chatBridge = new MinecraftChatBridge(this, 0);
-        chatBridge.run();
+        //MinecraftChatBridge chatBridge = new MinecraftChatBridge(this, 0);
+        //chatBridge.run();
 
         //new MinecraftChatBridge(this, 1).run();
+
+        Scanner in = new Scanner(System.in);
+
+        String word = "";
+        while(!(word.toLowerCase(Locale.ROOT).contains("stop"))) {
+            word = in.nextLine();
+        }
+
+        in.close();
+
+        System.exit(0);
     }
 
     public JDA getJda() {

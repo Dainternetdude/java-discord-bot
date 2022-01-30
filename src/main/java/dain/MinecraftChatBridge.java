@@ -1,6 +1,5 @@
 package dain;
 
-import dain.events.Logger;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -35,7 +34,8 @@ public class MinecraftChatBridge implements Runnable {
             try {
                 Thread.sleep(10);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                Logger.log("thread interrupted while sleeping", Logger.LoggingLevel.FATAL);
+                System.exit(-1);
             }
         }
     }
@@ -43,15 +43,19 @@ public class MinecraftChatBridge implements Runnable {
     public void sendNewMessages() {
         //sendMessageAllChannels("thread " + id + " sending new messages");
 
-        FTPHandler.grabFile("/logs/latest.log", id);
+        if (!Settings.isLocal) FTPHandler.grabFile("/logs/latest.log", id); // if its local dont do that
+
         try {
-            File file = new File(id + "latest.log");
+            File file = (Settings.isLocal ? new File("logs/latest.log") : new File(id + "latest.log")); // if its local grab from logs directory
             Scanner myReader = new Scanner(file);
-            while (myReader.hasNextLine()) { // change to detect new lines instead of most recent line
+
+            while (myReader.hasNextLine()) { //todo change to detect new lines instead of most recent line
                 lastLines[id] = myReader.nextLine();
             }
+
             myReader.close();
         } catch (FileNotFoundException e) {
+
             Logger.log("File not found. Where is latest.log?", Logger.LoggingLevel.ERROR);
             e.printStackTrace();
         }

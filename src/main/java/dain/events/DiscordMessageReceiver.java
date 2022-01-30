@@ -1,15 +1,11 @@
 package dain.events;
 
 import dain.CommandHandler;
+import dain.Logger;
 import dain.MinecraftChatBridge;
 import dain.Settings;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.kronos.rkon.core.Rcon;
-import net.kronos.rkon.core.ex.AuthenticationException;
-
-import java.io.IOException;
 
 public class DiscordMessageReceiver extends ListenerAdapter {
 

@@ -1,4 +1,4 @@
-package dain.events;
+package dain;
 
 import javax.swing.*;
 
@@ -20,8 +20,10 @@ public class Logger {
 		string = string + message;
 		string = string + "\n";
 
-		textArea.append(string);
-		textArea.setCaretPosition(textArea.getDocument().getLength());
+		if (Settings.useGui && textArea != null) {
+			textArea.append(string);
+			textArea.setCaretPosition(textArea.getDocument().getLength());
+		}
 
 		System.out.print(string);
 	}
