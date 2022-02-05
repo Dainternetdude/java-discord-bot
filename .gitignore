@@ -13,3 +13,4 @@
 /gradlew.bat
 /settings.gradle
 /logs/
+*.xcf
