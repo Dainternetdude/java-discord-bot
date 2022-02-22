@@ -3,8 +3,7 @@
 /build/
 /out/
 /out/production/classes/
-/0latest.log
-/1latest.log
+/*latest.log
 /settings.txt
 /.idea/
 /gradle/
@@ -14,3 +13,4 @@
 /settings.gradle
 /logs/
 *.xcf
+.gitignore

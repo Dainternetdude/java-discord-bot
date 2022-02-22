@@ -12,16 +12,17 @@ import java.util.*;
 public class MinecraftChatBridge implements Runnable {
 
     private final TextChannel [] channels = new TextChannel[Settings.DISCORD_CHANNEL_IDS.length];
-    private String [] lastLines = { "", "" };
-    private String [] previousLines = { "", "" };
-    private final JDA jda;
-    private int id;
+    private String line = "";
+    private int previousLineNumber = 0;
+    private boolean serverInitIsDone = false;
 
-    private int requestID = new Random().nextInt(Integer.MAX_VALUE);
+    private final JDA jda;
+    private final int id;
 
     public MinecraftChatBridge(Bot botIn, int idIn) {
         jda = botIn.getJda();
         id = idIn;
+
         for(int i = 0; i < Settings.DISCORD_CHANNEL_IDS.length; i++) {
             channels[i] = jda.getTextChannelById(Settings.DISCORD_CHANNEL_IDS[i]);
         }
@@ -30,9 +31,14 @@ public class MinecraftChatBridge implements Runnable {
     @Override
     public void run() {
         while(true) {
-            sendNewMessages();
+            if (!Settings.isLocal) FTPHandler.grabFile("/logs/latest.log", id); // if its local dont do that
+
+            boolean shouldContinue;
+            do {
+                shouldContinue = sendNewMessage();
+            } while(shouldContinue); // sendNewMessages returns false once it reaches the end of the file
             try {
-                Thread.sleep(10);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 Logger.log("thread interrupted while sleeping", Logger.LoggingLevel.FATAL);
                 System.exit(-1);
@@ -40,43 +46,48 @@ public class MinecraftChatBridge implements Runnable {
         }
     }
 
-    public void sendNewMessages() {
-        //sendMessageAllChannels("thread " + id + " sending new messages");
-
-        if (!Settings.isLocal) FTPHandler.grabFile("/logs/latest.log", id); // if its local dont do that
-
+    public boolean sendNewMessage() {
         try {
             File file = (Settings.isLocal ? new File("logs/latest.log") : new File(id + "latest.log")); // if its local grab from logs directory
-            Scanner myReader = new Scanner(file);
+            Scanner scanner = new Scanner(file);
 
-            while (myReader.hasNextLine()) { //todo change to detect new lines instead of most recent line
-                lastLines[id] = myReader.nextLine();
+            for (int i = 0; i < previousLineNumber; i++) {
+                if (scanner.hasNext()) {
+                    line = scanner.nextLine();
+                } else return false;
             }
 
-            myReader.close();
-        } catch (FileNotFoundException e) {
+            previousLineNumber++;
 
+            scanner.close();
+        } catch (FileNotFoundException e) {
             Logger.log("File not found. Where is latest.log?", Logger.LoggingLevel.ERROR);
             e.printStackTrace();
         }
-        if (lastLines[id].equals(previousLines[id])) return;
-        previousLines[id] = lastLines[id];
-
-        //sendMessageAllChannels(lastLines[id]);
 
         // only grabs stuff after the "[Server thread/INFO]: "
         try {
-            lastLines[id] = lastLines[id].split("\\[Server thread/INFO]: ")[1];
+            line = line.split("\\[Server thread/INFO]: ")[1];
         } catch (IndexOutOfBoundsException e) {
-            return;
+            return true;
         }
-        Logger.log("Message received from Minecraft: " + lastLines[id], Logger.LoggingLevel.INFO);
+        // if the message has square brackets or curly braces in dont send
+        if (line.matches("(.*\\[.*].*)|(.*\\{.*}.*)")) return true;
+        // if the message has no letters dont send
+        if (!line.matches(".*\\w.*")) return true;
+        // once you receive the 'Dont (X.XXXs)! For help, type "/help"' message start sending messages
+        if (line.matches("Done \\(\\d+\\.\\d*s\\)!.*")) serverInitIsDone = true;
+        if (!serverInitIsDone) return true;
 
-        String processedLine = processLine(lastLines[id]);
+        Logger.log("Message received from Minecraft: " + line, Logger.LoggingLevel.INFO);
+
+        String processedLine = processLine(line);
 
         sendMessageAllChannels(processedLine);
 
         Logger.log("Message sent to Discord: " + processedLine, Logger.LoggingLevel.INFO);
+
+        return true;
     }
 
     private void sendMessageAllChannels(String message) {
@@ -87,8 +98,8 @@ public class MinecraftChatBridge implements Runnable {
 
     private String processLine(String line) {
 
-        // replace ipv4 IP addresses with "[IP ADDRESS REDACTED]"
-        line = line.replaceAll("(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)", "[IP ADDRESS REDACTED]");
+        // replace ipv4 IP addresses + port with "[IP ADDRESS REDACTED]"
+        line = line.replaceAll("(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?):\\d{1,5}\\b", "[IP ADDRESS REDACTED]");
 
         //break the message up into an array of strings for each word
         String[] lineArray = line.split(" ");
@@ -139,7 +150,9 @@ public class MinecraftChatBridge implements Runnable {
         }
 
         //say if its coming from smp or cmp
-        line = "[" + Settings.SERVER_NAMES[id] + "] " + line;
+        if (Settings.SERVER_NAMES.length > 1) {
+            line = "[" + Settings.SERVER_NAMES[id] + "] " + line;
+        }
 
         if (isChatMessage) {
             sendMessageAllOtherServers(author, message);
@@ -212,9 +225,7 @@ public class MinecraftChatBridge implements Runnable {
             Rcon rcon = new Rcon(Settings.SERVER_IPS[serverId], Integer.decode(Settings.RCON_PORTS[serverId]), Settings.RCON_PASSWORDS[serverId].getBytes());
             rcon.command(command);
             rcon.disconnect();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (AuthenticationException e) {
+        } catch (IOException | AuthenticationException e) {
             e.printStackTrace();
         }
     }
