@@ -1,15 +1,11 @@
 package dain;
 
-import dain.events.DiscordMessageReceiver;
+import dain.events.*;
 import net.dv8tion.jda.api.*;
-import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.entities.TextChannel;
-import javax.security.auth.login.LoginException;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.Locale;
-import java.util.Scanner;
+import net.dv8tion.jda.api.entities.*;
+
+import javax.security.auth.login.*;
+import java.util.*;
 
 public class Bot {
 
@@ -45,7 +41,7 @@ public class Bot {
         TextChannel [] channels = new TextChannel[Settings.DISCORD_CHANNEL_IDS.length];
         for(int i = 0; i < Settings.DISCORD_CHANNEL_IDS.length; i++) {
             channels[i] = jda.getTextChannelById(Settings.DISCORD_CHANNEL_IDS[i]);
-            Logger.log("Chat Bridge active.", Logger.LoggingLevel.INFO);
+            Logger.info("Chat Bridge active.");
             channels[i].sendMessage("Chat bridge active.").queue();
         }
 

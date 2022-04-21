@@ -5,7 +5,6 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.kronos.rkon.core.Rcon;
 import net.kronos.rkon.core.ex.AuthenticationException;
-
 import java.io.*;
 import java.util.*;
 
@@ -40,7 +39,7 @@ public class MinecraftChatBridge implements Runnable {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
-                Logger.log("thread interrupted while sleeping", Logger.LoggingLevel.FATAL);
+                Logger.fatal("thread interrupted while sleeping");
                 System.exit(-1);
             }
         }
@@ -61,7 +60,7 @@ public class MinecraftChatBridge implements Runnable {
 
             scanner.close();
         } catch (FileNotFoundException e) {
-            Logger.log("File not found. Where is latest.log?", Logger.LoggingLevel.ERROR);
+            Logger.error("File not found. Where is latest.log?");
             e.printStackTrace();
         }
 
@@ -79,13 +78,13 @@ public class MinecraftChatBridge implements Runnable {
         if (line.matches("Done \\(\\d+\\.\\d*s\\)!.*")) serverInitIsDone = true;
         if (!serverInitIsDone) return true;
 
-        Logger.log("Message received from Minecraft: " + line, Logger.LoggingLevel.INFO);
+        Logger.info("Message received from Minecraft: " + line);
 
         String processedLine = processLine(line);
 
         sendMessageAllChannels(processedLine);
 
-        Logger.log("Message sent to Discord: " + processedLine, Logger.LoggingLevel.INFO);
+        Logger.info("Message sent to Discord: " + processedLine);
 
         return true;
     }
@@ -195,7 +194,7 @@ public class MinecraftChatBridge implements Runnable {
         for (int id = 0; id < Settings.SERVER_IPS.length; id++) {
             sendCommandToServer(command, id);
         }
-        Logger.log("Message sent to Minecraft: " + message, Logger.LoggingLevel.INFO);
+        Logger.info("Message sent to Minecraft: " + message);
     }
 
     public static void sendMessageToServer(String author, String message, int serverId) {

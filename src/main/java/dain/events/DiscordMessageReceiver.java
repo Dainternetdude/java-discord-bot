@@ -9,17 +9,17 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class DiscordMessageReceiver extends ListenerAdapter {
 
-    private enum Commands { // todo maybe better as an enum?
+    private enum Commands {
             KILL("kill"),
             SCORE("score"),
             HELP("help");
 
-            private String value;
+            private final String value;
 
-        private Commands(String valueIn) {
+        Commands(String valueIn) {
             this.value = valueIn;
         }
-    };
+    }
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
@@ -44,10 +44,9 @@ public class DiscordMessageReceiver extends ListenerAdapter {
 
         for (int id = 0; id < Settings.DISCORD_CHANNEL_IDS.length; id++) { // for all Discord channels ids in config
             if (event.getChannel() == event.getJDA().getTextChannelById(Settings.DISCORD_CHANNEL_IDS[id])) { // if the channel id from the config matches one of the channel id that the message was sent from //todo need to optimize this
-                Logger.log("Message received from Discord: " + messageSent, Logger.LoggingLevel.INFO);
+                Logger.info("Message received from Discord: " + messageSent);
                 MinecraftChatBridge.sendMessageToMc(event.getMessage()); // send message to mc
             }
         }
-        return;
     }
 }

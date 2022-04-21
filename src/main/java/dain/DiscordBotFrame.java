@@ -2,9 +2,7 @@ package dain;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.util.Objects;
+import java.util.*;
 
 public class DiscordBotFrame extends JFrame {
 
@@ -26,11 +24,9 @@ public class DiscordBotFrame extends JFrame {
         addComponent(settingsLabel, layout, 1, 0, 1, 1, GridBagConstraints.NONE);
 
         JButton settingsButton = new JButton(); // no text on settings button just gear icon
-        settingsButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                if(event.getSource() == settingsButton) {
-                    new SettingsFrame();
-                }
+        settingsButton.addActionListener(event -> {
+            if(event.getSource() == settingsButton) {
+                new SettingsFrame();
             }
         });
         ImageIcon settingsIcon = new ImageIcon(Objects.requireNonNull(getClass().getClassLoader().getResource("settings-icon.png")));
@@ -47,8 +43,8 @@ public class DiscordBotFrame extends JFrame {
         logTextArea.setEnabled(false);
         JScrollPane logScrollPane = new JScrollPane(logTextArea);
         logScrollPane.setWheelScrollingEnabled(false); // do not allow scrolling with mouse scroll wheel
-        logScrollPane.setHorizontalScrollBarPolicy(31); // 31 = never show horizontal scroll bar
-        logScrollPane.setVerticalScrollBarPolicy(21); // 21 = never show vertical scroll bar
+        logScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        logScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
         addComponent(logScrollPane, layout, 0, 3, 2, 1, GridBagConstraints.NONE);
         Logger.setTextArea(logTextArea);
 
@@ -71,7 +67,7 @@ public class DiscordBotFrame extends JFrame {
         try {
             Thread.sleep(ms);
         } catch(InterruptedException exception) {
-            Logger.log("thread interrupted exception", Logger.LoggingLevel.ERROR);
+            Logger.error("thread interrupted exception");
         }
     }
 

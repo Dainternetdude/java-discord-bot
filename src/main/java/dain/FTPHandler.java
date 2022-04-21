@@ -39,7 +39,7 @@ public class FTPHandler {
             ftpClient.disconnect();
 
         } catch (IOException e) {
-            Logger.log("I/O Exception during FTP handling", Logger.LoggingLevel.ERROR);
+            Logger.error("I/O Exception during FTP handling");
         }
     }
 }

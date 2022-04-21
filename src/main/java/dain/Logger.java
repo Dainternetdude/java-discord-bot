@@ -6,7 +6,7 @@ public class Logger {
 
 	private static JTextArea textArea;
 
-	public enum LoggingLevel {
+	private enum LoggingLevel {
 		INFO, WARN, ERROR, FATAL
 	}
 
@@ -14,7 +14,7 @@ public class Logger {
 		textArea = textAreaIn;
 	}
 
-	public static void log(String message, LoggingLevel level) {
+	private static void log(String message, LoggingLevel level) {
 		String string = "[" + level;
 		string = string + " @ " + java.time.LocalTime.now() + "]: ";
 		string = string + message;
@@ -26,5 +26,21 @@ public class Logger {
 		}
 
 		System.out.print(string);
+	}
+	
+	public static void info(String message) {
+		log(message, LoggingLevel.INFO);
+	}
+	
+	public static void warn(String message) {
+		log(message, LoggingLevel.WARN);
+	}
+	
+	public static void error(String message) {
+		log(message, LoggingLevel.ERROR);
+	}
+	
+	public static void fatal(String message) {
+		log(message, LoggingLevel.FATAL);
 	}
 }

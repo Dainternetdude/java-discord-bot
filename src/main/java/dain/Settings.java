@@ -1,8 +1,7 @@
 package dain;
 
 import java.io.*;
-import java.nio.channels.SeekableByteChannel;
-import java.util.Scanner;
+import java.util.*;
 
 public class Settings {
 
@@ -50,7 +49,7 @@ public class Settings {
         }
 
         if (isLocal) {
-            Logger.log("Bot is running in local mode. Server IPs & FTP login details will be overridden.", Logger.LoggingLevel.WARN);
+            Logger.warn("Bot is running in local mode. Server IPs & FTP login details will be overridden.");
             SERVER_IPS = new String[] {"127.0.0.1"};
             FTP_USERNAMES = new String[0];
             FTP_PASSWORDS = new String[0];

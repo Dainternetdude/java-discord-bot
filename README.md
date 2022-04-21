@@ -1,6 +1,5 @@
 # What is this?
 This is a Discord bot written in Java that can link the chat of Minecraft servers with Discord channels.
-<img width="1440" alt="Screenshot of the program running on a blank desktop" src="https://user-images.githubusercontent.com/53956237/136717891-a6233941-3776-4acb-9a66-50c6ec680d4d.png">
 
 # Why should I use this one instead of countless others?
 Here's what makes this implementation unique:
